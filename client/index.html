@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+   
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>UNO</title>
+
+    <!-- ICONS FROM GOOGLE -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="app.ts"></script>
+</head>
+
+<body>
+
+    <div id="players">
+        <div class="player">
+            <h3>Chuck Norris</h3>
+            <p class="handcard-count">∞</p>
+        </div>
+        
+    </div>
+
+
+    <div id="deck">
+        <div class="deck-card"></div>
+    </div>
+    <div id="played-cards">
+        
+    </div>
+    <div class="spinner-div zoom">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="selected-card-div">
+        <p class="card handcard card-big" id="selected-card" style="background-color: red" data-cardtype="r5"><span id="num">5</span>
+            <span class='play' title='Play this card'>^</span>
+        </p>
+    </div>
+
+    
+    <div id="handcard-wrapper">
+        <div class="noselect" id="handcards">
+            
+        </div>
+    </div>
+
+
+
+    <!-- modals -->
+
+    <div class="modal-container active" >
+        <div class="modal active" id="connect">
+            <!-- Tab navigation -->
+            <div class="tab-bar active">
+                <button class="tab-btn active" id="tab-join-btn">JOIN SESSION</button>
+                <button class="tab-btn" id="tab-create-btn">CREATE SESSION</button>
+            </div>
+            <div class="tab-content active" id="join-session-tab">
+                <form>
+                    <div class="data">
+                        <p>Session-ID: </p>
+                        <input type="text" id="sessionID" title="SESSION-ID" size="7"><br>
+                        <p>Nickname: </p>
+                        <input type="text" id="nickname" title="NAME" size="20">
+                    </div>
+                    
+                    <input class="big-button" type="submit" id="connect-btn" value="CONNECT"></input>
+                </form>
+            </div>
+
+            <div class="tab-content" id="create-session-tab">
+                <form>
+                    <div class="data">
+                        <p>Nickname: </p>
+                        <input type="text" title="NAME" id="nickname" size="20">
+                    </div>
+                    
+                    <input class="big-button" type="submit" id="connect-btn" value="CREATE SESSION"></input>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal" id="waiting">
+            
+            <h1>SessionID: </h1>
+            <table>
+                <tr>
+                    <th>Player Name</th>
+                    <th>Player ID</th>
+                    <th>State</th>
+                </tr>
+            </table>
+            <button class="big-button" >I'M READY</button>
+        </div>
+        
+        
+    </div>
+</body>

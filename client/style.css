@@ -1,0 +1,477 @@
+html, body {
+    /* Variables */
+    --verylight : white;
+    --light: lightgray;
+    --medium: grey;
+    --dark: rgb(112, 112, 112);
+    --verydark: black;
+    --active : orange;
+    --success : lightgreen;
+
+
+    margin: 0px;
+    padding: 0px;
+    height: 100vh;
+    width: 100vw;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    background-color: var(--light);
+}
+
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome and Opera */
+  }
+
+/* Cards general */
+.card {
+    width: 4rem;
+    height: 6rem;
+    border-radius: 10px;
+    min-width: 4rem;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    line-height: 6rem;
+    text-shadow: 0 0 3px black;
+
+    -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
+    
+}
+
+.card-big {
+    transform: scale(2);
+}
+
+
+/*  Players  */
+
+#players {
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.player {
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: auto 30px;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 10rem;
+    background-color: var(--verydark);
+    margin: 10px;
+    border: solid 6px var(--verydark);;
+}
+
+@keyframes active-player {
+    0% {
+        border-color:var(--verydark);
+    }
+    50% {
+        border-color: var(--active);
+    }
+    100% {
+        border-color:var(--verydark);
+    }
+}
+
+.player.active {
+    animation: active-player 1.0s ease-in-out infinite;
+}
+
+.player .handcard-count {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+    line-height: 30px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+/*  Played-Cards   */
+
+#played-cards {
+    width: 8rem;
+    height: 8rem;
+    display: block;
+    position: fixed;
+    z-index: 5;
+    background-color: var(--medium);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    padding: 0px;
+    margin-left: -4rem;
+    margin-top: -4rem;
+
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+#played-cards .card {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -2rem;
+    margin-top: -3rem;
+}
+
+
+/*  Spinner center */
+
+.spinner-div {
+    z-index: 0;
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 0px;
+    width: 8rem;
+    height: 8rem;
+    transform: scale(1);
+    transform-origin: center;
+    margin: calc(-4rem - 16px) 0 0 calc(-4rem - 16px);
+}
+
+@keyframes zoom {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.spinner-div.zoom {
+    animation: zoom 0.5s ease-in-out;
+}
+
+
+.spinner {
+ 
+    border: 16px solid transparent; /* Light grey */
+    border-top: 16px solid var(--dark); /* Blue */
+    border-radius: 50%;
+    width: 8rem;
+    height: 8rem;
+    
+    animation: spin 2s linear infinite;
+    transition: all 0.5s ease-in-out;
+
+    
+}
+
+
+.spinner.ccw {
+    animation-direction: reverse;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/*  Deckcards   */
+
+.deck-card {
+    background-color: var(--verydark); 
+    position: absolute;
+    transition: all 0.2s ease-in-out;
+}
+
+.deck-card:last-child:hover {
+    -webkit-box-shadow: 0px 0px 0px 3px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 3px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 3px rgba(255,255,255,1);
+}
+
+.deck-card::after {
+    content: "?";
+    color: white;
+    line-height: 6rem;
+    display: block;
+    width: 4rem;
+    text-align: center;
+    font-size: 4rem;
+}
+
+#deck {
+    width: 200px;
+    height: 300px;
+    position: absolute;
+    top: 7rem;
+    margin-bottom: 3rem;
+    left: 20px;
+}
+
+
+
+
+/* Selected card */
+#selected-card-div {
+    position: fixed;
+    z-index: 6;
+    display: block;
+    width: 10rem;
+    height: 10rem;
+    left: 50%;
+    margin-left: -5rem;
+    bottom: 8rem;
+}
+
+#selected-card {
+    margin: auto;
+    display: block;
+    transform: scale(0);
+}
+
+#selected-card.open {
+    transform: scale(1.5);
+}
+
+#selected-card .play {
+    margin: 0;
+
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    line-height: 2.5rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 5px;
+}
+
+#selected-card .play:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+
+}
+
+
+/*  Handcards   */
+
+#handcard-wrapper {
+    width: 100vw;
+    height: 8rem;
+    position: absolute;
+    overflow: visible;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    bottom: 0px;
+    flex: 1;
+    display: flex;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--verydark);
+}
+
+#handcard-wrapper.active {
+    animation: active-player 1s ease-in-out infinite;
+}
+
+#handcards {
+    
+    padding: 10px 0px;
+    margin: 0 auto;
+    width: auto;
+    overflow: visible;
+    display: flex;
+    justify-content: flex-start;
+ 
+    flex-wrap: nowrap;
+    
+}
+
+.handcard {
+    position: relative;
+
+    margin: 0px 10px;
+   
+
+    transition: all 0.2s ease-in-out;
+
+    
+}
+
+.handcard:hover {
+    -webkit-box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+}
+
+
+@keyframes selected-scale {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0);
+    }
+}
+
+.handcard.selected {
+    animation: selected-scale 0.2s;
+    animation-fill-mode: forwards;
+    -webkit-box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 5px rgba(255,255,255,1);
+}
+
+/* LOGIN / Join */
+
+.modal-container {
+    z-index: 10;
+    display: none;
+    position: fixed;
+    margin: auto;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-container.active {
+    display: block;
+}
+
+.modal-container .modal {
+    max-width: 500px;
+    max-height: 400px;
+    margin: 20px auto;
+    background-color: var(--medium);
+    border-radius: 5px;
+    padding: 10px;
+    display: none;
+}
+
+.modal-container .modal.active {
+    display: block;
+}
+
+.modal#waiting table {
+    width: 90%;
+}
+
+.tab-bar {
+    width: 100%;
+    display: none;
+}
+
+.tab-bar.active {
+    display: block;
+}
+
+.tab-bar .tab-btn {
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    margin: 0px;
+    background-color: var(--dark);
+    border-radius: 10px 10px 0px 0px;
+}
+
+.tab-bar .tab-btn.active {
+    background-color: var(--active);
+    color: #ffffff;
+  
+}
+
+.tab-bar .tab-btn:hover {
+    color: #ffffff;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+    height: 80%;
+
+}
+
+.tab-content form .data {
+    
+    padding-top: 15px;
+    display: grid;
+    grid-template-columns: 30% 70%;
+
+    border-radius: 0 5px 5px 5px;
+    background-color: var(--light);
+}
+
+.tab-content.active {
+    display: inline;
+}
+
+
+.tab-content .data input{
+    margin: 10px;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+}
+
+
+.big-button {
+    display: block;
+    font-size: 2rem;
+    margin: 10px;
+    width: calc(100% - 20px);
+    height: 50px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--verylight);
+    color: var(--active);
+    border: solid 2px var(--active);
+    transition: all .2s ease-in-out;
+
+}
+
+.big-button.ready {
+    color: var(--success);
+    border: solid 2px var(--success);
+}
+
+.big-button:hover {
+    background-color: var(--active);
+    color: var(--verylight);
+}
+
+.big-button.ready:hover {
+    background-color: var(--success);
+    color: var(--verylight);
+}
+
+
+.tab-content p {
+    margin: 10px;
+    grid-column: 1;
+    height: 30px;
+}
+
+
+@media only screen and (max-width: 500px) {
+    html {
+        font-size: 10px;
+    }
+
+    #deck {
+
+        top: 9rem;
+        margin-bottom: 3rem;
+    }
+}
