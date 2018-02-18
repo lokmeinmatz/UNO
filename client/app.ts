@@ -1,6 +1,6 @@
 import { setTimeout } from "timers";
 import UI from "./UI"
-import userState, {JoinState} from "./States"
+import userState, {JoinState} from "./ClientStates"
 const $ : JQueryStatic = require("./jquery")
 
 
@@ -27,7 +27,7 @@ $(document).ready(() => {
         UI.addHandCard(deck.pop())
     }
     
-    UI.updateDeck(deck)
+    
     
 
    

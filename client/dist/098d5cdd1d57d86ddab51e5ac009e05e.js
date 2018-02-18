@@ -10816,34 +10816,45 @@ class UI {
             container.removeClass("zoom");
         }, 500);
     }
-    updateDeck(deck) {
+    updateDeck(height, onDraw) {
         const Jdeck = $("#deck");
         Jdeck.children().remove();
-        for (let i = 0; i < deck.length; i++) {
+        for (let i = 0; i < height; i++) {
             const card = $("<div class='card deck-card'>");
             card.css("left", i * 5);
             card.css("top", i * 5);
             Jdeck.append(card);
-            card.click(function () {
-                //add card to hand, if playable: preview
-                if (deck.length > 0) {
-                    let cardType = deck.pop();
-                    UIi.addHandCard(cardType);
-                    UIi.setHandClickHandler();
-                    UIi.updateDeck(deck);
-                }
-            });
         }
+        Jdeck.children().last().off("click").click(function () {
+            onDraw();
+        });
     }
 }
 const UIi = new UI();
 exports.default = UIi;
 
-},{"./colors":10,"./jquery":7}],5:[function(require,module,exports) {
+},{"./colors":10,"./jquery":7}],17:[function(require,module,exports) {
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketEvents = {
+    ClientToServer: {
+        join: "join",
+        create: "create",
+        ready: "waiting.ready"
+    },
+    ServerToClient: {
+        joinResponse: "join.res",
+        alert: "alert"
+    }
+};
+
+},{}],16:[function(require,module,exports) {
+"use strict";
+//CLIENT
 Object.defineProperty(exports, "__esModule", { value: true });
 const UI_1 = require("./UI");
 const $ = require("./jquery");
+const utils_1 = require("./utils");
 class EmptyState {
     removeListeners() {
         console.info("Empty State has no Listeners");
@@ -10860,7 +10871,7 @@ class JoinState {
             const sid = $(this).find("#sessionID").val();
             const nick = $(this).find("#nickname").val();
             console.log(`trying to join ${sid} with nick ${nick}`);
-            socket.emit("join", { sessionID: sid, nickname: nick });
+            socket.emit(utils_1.SocketEvents.ClientToServer.join, { sessionID: sid, nickname: nick });
             return false;
         });
         //handle create
@@ -10869,11 +10880,11 @@ class JoinState {
             //Send reqest to join
             const nick = $(this).find("#nickname").val();
             console.log(`trying to create session with nick ${nick}`);
-            socket.emit("create", nick);
+            socket.emit(utils_1.SocketEvents.ClientToServer.create, nick);
             return false;
         });
         //get join-response
-        socket.on("join.res", (res) => {
+        socket.on(utils_1.SocketEvents.ServerToClient.joinResponse, (res) => {
             console.log(res);
             if (res.success) {
                 //Get to waiting lobby
@@ -10891,7 +10902,7 @@ class JoinState {
     removeListeners() {
         $("#join-session-tab form").off("submit");
         $("#create-session-tab form").off("submit");
-        this.socket.removeAllListeners("join.res");
+        this.socket.removeAllListeners(utils_1.SocketEvents.ServerToClient.joinResponse);
     }
 }
 exports.JoinState = JoinState;
@@ -10912,7 +10923,7 @@ class WaitingState {
                 ready = true;
             }
             console.log(`Player is ready: ${ready}`);
-            socket.emit("waiting.ready", ready);
+            socket.emit(utils_1.SocketEvents.ClientToServer.ready, ready);
         });
         //update waiting screen
         socket.on("waiting.update.res", (data) => {
@@ -10960,6 +10971,12 @@ class PlayState {
             else {
                 UI_1.default.setIamActive(false);
             }
+            UI_1.default.setDirection(gameData.direction);
+        });
+        UI_1.default.updateDeck(5, () => {
+            //draw card
+            let playerEvent = { type: "", data: {} };
+            socket.emit("game.playerEvent", playerEvent);
         });
     }
     removeListeners() {
@@ -10976,11 +10993,11 @@ class UserStateManager {
 let userState = new UserStateManager();
 exports.default = userState;
 
-},{"./UI":6,"./jquery":7}],3:[function(require,module,exports) {
+},{"./UI":6,"./jquery":7,"./utils":17}],3:[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const UI_1 = require("./UI");
-const States_1 = require("./States");
+const ClientStates_1 = require("./ClientStates");
 const $ = require("./jquery");
 let deck = ["r4", "g7", "b2", "y9", "r8", "g3", "b6", "y3"];
 $(document).ready(() => {
@@ -10989,15 +11006,14 @@ $(document).ready(() => {
     socket.on("alert", (text) => {
         alert(text);
     });
-    States_1.default.setState(new States_1.JoinState(socket));
+    ClientStates_1.default.setState(new ClientStates_1.JoinState(socket));
     for (let i = 0; i < 4; i++) {
         UI_1.default.addHandCard(deck.pop());
     }
-    UI_1.default.updateDeck(deck);
     UI_1.default.setHandClickHandler();
 });
 
-},{"./UI":6,"./States":5,"./jquery":7}],11:[function(require,module,exports) {
+},{"./UI":6,"./ClientStates":16,"./jquery":7}],11:[function(require,module,exports) {
 
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;

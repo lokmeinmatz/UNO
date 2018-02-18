@@ -1,5 +1,5 @@
 import { read } from "fs";
-import {GameUpdate} from "./client/utils"
+import {GameUpdate, SocketEvents} from "./client/utils"
 
 
 
@@ -82,13 +82,13 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
             console.log(`player ${nickname} has joined session ${sID}`)
 
             //response
-            socket.emit("join.res", {success: true, playerID:player.playerID})
+            socket.emit(SocketEvents.ServerToClient.joinResponse, {success: true, playerID:player.playerID})
         }
         else{
 
             //response
-            socket.emit("join-res", {success: false})
-            socket.emit("alert", "Youd did something wrong while joining a session... :(")
+            socket.emit(SocketEvents.ServerToClient.joinResponse, {success: false})
+            socket.emit(SocketEvents.ServerToClient.alert, "Youd did something wrong while joining a session... :(")
             console.log(`Error on joining session ${sID}`)
         }
     }
@@ -101,7 +101,7 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
 
         if(nick.length < 2) {
             //response
-            socket.emit("join.res", {success: false})
+            socket.emit(SocketEvents.ServerToClient.joinResponse, {success: false})
             return
         }
 
@@ -117,22 +117,8 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
        
     })
 
-    socket.on("waiting.update.req", () => {
-        if(player.currentSession) {
-            player.currentSession.sendPlayerListUpdate()
-        }
-    })
 
-    socket.on("waiting.ready", (state) => {
-        if(player.currentSession){
-            console.log("received waiting.ready")
-            player.isReady = state
-            
-            player.currentSession.sendPlayerListUpdate()
-            player.currentSession.checkState()
-        }
-        
-    })
+    
 
    
 })

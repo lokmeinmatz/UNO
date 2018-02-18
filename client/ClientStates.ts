@@ -1,7 +1,9 @@
 
+//CLIENT
+
 import UI from "./UI"
 const $ : JQueryStatic = require("./jquery")
-import {GameUpdate} from "./utils"
+import {GameUpdate, PlayerEvent, SocketEvents} from "./utils"
 
 interface UserState {
     socket : SocketIO.Socket
@@ -38,7 +40,7 @@ export class JoinState implements UserState {
             const sid = $(this).find("#sessionID").val()
             const nick = $(this).find("#nickname").val()
             console.log(`trying to join ${sid} with nick ${nick}`)
-            socket.emit("join", {sessionID : sid, nickname: nick})
+            socket.emit(SocketEvents.ClientToServer.join, {sessionID : sid, nickname: nick})
             return false
         })
 
@@ -49,12 +51,12 @@ export class JoinState implements UserState {
             //Send reqest to join
             const nick = $(this).find("#nickname").val()
             console.log(`trying to create session with nick ${nick}`)
-            socket.emit("create", nick)
+            socket.emit(SocketEvents.ClientToServer.create, nick)
             return false
         })
 
         //get join-response
-        socket.on("join.res", (res) => {
+        socket.on(SocketEvents.ServerToClient.joinResponse, (res) => {
             console.log(res)
             if(res.success) {
                 //Get to waiting lobby
@@ -77,7 +79,7 @@ export class JoinState implements UserState {
     removeListeners() {
         $("#join-session-tab form").off("submit")
         $("#create-session-tab form").off("submit")
-        this.socket.removeAllListeners("join.res")
+        this.socket.removeAllListeners(SocketEvents.ServerToClient.joinResponse)
     }
 
 }
@@ -105,7 +107,7 @@ class WaitingState implements UserState {
                 ready = true
             }
             console.log(`Player is ready: ${ready}`)
-            socket.emit("waiting.ready", ready)
+            socket.emit(SocketEvents.ClientToServer.ready, ready)
             
         })
 
@@ -161,6 +163,17 @@ class PlayState implements UserState {
                 UI.setIamActive(true)
             }
             else{ UI.setIamActive(false) }
+
+            UI.setDirection(gameData.direction)
+            
+        })
+
+        UI.updateDeck(5, () => {
+            //draw card
+
+            let playerEvent : PlayerEvent = {type : "", data : {}}
+
+            socket.emit("game.playerEvent", playerEvent)
         })
     }
 

@@ -278,9 +278,12 @@ html, body {
     display: flex;
     transition: all 0.2s ease-in-out;
     background-color: var(--verydark);
+    filter: brightness(0.5) blur(1px);
 }
 
 #handcard-wrapper.active {
+    filter: brightness(1) blur(0px);
+    border-top: solid 3px var(--verydark);
     animation: active-player 1s ease-in-out infinite;
 }
 

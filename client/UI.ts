@@ -203,25 +203,18 @@ class UI {
         
     }
 
-    updateDeck(deck : string[]) {
+    updateDeck(height: number, onDraw : Function) {
         const Jdeck = $("#deck")
         Jdeck.children().remove()
-        for(let i = 0; i < deck.length; i++) {
+        for(let i = 0; i < height; i++) {
             const card = $("<div class='card deck-card'>")
             card.css("left", i*5)
             card.css("top", i*5)
             Jdeck.append(card)
-    
-            card.click(function() {
-                //add card to hand, if playable: preview
-                if(deck.length > 0) {
-                    let cardType = deck.pop()
-                    UIi.addHandCard(cardType)
-                    UIi.setHandClickHandler()
-                    UIi.updateDeck(deck)
-                }
-            })
         }
+        Jdeck.children().last().off("click").click(function() {
+            onDraw()
+        })
     }
 }
 
