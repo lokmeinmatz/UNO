@@ -11,10 +11,7 @@ class UI {
     selectedHand : JQuery
     selectedPreview : JQuery 
 
-    init(
-        joinHandle : (event : JQuery.Event, jObj : JQuery) => void, 
-        createHandle : (event : JQuery.Event, jObj : JQuery) => void,
-        readyHandle : (jObj : JQuery, ready:boolean) => void) {
+    init() {
         //must be called on domready
         
         
@@ -49,32 +46,11 @@ class UI {
             $(".tab-content#create-session-tab").addClass("active")
         })
 
-        //handle join 
-        $("#join-session-tab form").submit(function(event) {
-            joinHandle(event, $(this))
-        })
+        
 
-        //handle create
-        $("#create-session-tab form").submit(function(event) {
-            createHandle(event, $(this))
-        })
+        
 
-        //handle ready
-        $(".modal#waiting button").click(function() {
-            
-    
-            if($(this).hasClass("ready")) {
-                $(this).removeClass("ready")
-                $(this).text("I'M READY")
-                
-            }
-            else {
-                $(this).addClass("ready")
-                $(this).text("WAIT FOR PLAYERS")
-            }
-            readyHandle($(this), $(this).hasClass("ready"))
-            
-        })
+        
 
         //selected card handler
         $("#selected-card").click(function() {
@@ -179,22 +155,7 @@ class UI {
         
     }
 
-    updateWaitingScreen(data) {
-        //Set session id
-        $(".modal#waiting h1").text("SessionID: "+data.sessionID)
-
-        const root = $(".modal#waiting table")
-        root.children().remove()
-        for(let player of data.players) {
-            const tr = $("<tr>")
-            tr.append("<td>"+player.name+"</td>")
-            tr.append("<td>"+player.id+"</td>")
-            if(player.ready)tr.append("<td><i class='material-icons'>done</i></td>")
-            else tr.append("<td><i class='material-icons'>cached</i></td>")
-            root.append(tr)
-        }
-    }
-
+   
     setModalVisiblilty(visible: boolean) {
         if(visible) {
             $(".modal-container").addClass("active")

@@ -1,14 +1,16 @@
 import { read } from "fs";
 import {GameUpdate} from "./client/utils"
+
+
+
+import {sessions, Session} from "./Sessions"
+import {players, Player} from "./Players"
+
 const express = require("express")
 const app = express()
 const server = require("http").createServer(app)
 const socketIO = require("socket.io")
-const crypto = require('crypto');
 
-function sha256(data) : string {
-    return crypto.createHash("sha256").update(data).digest("hex");
-}
 const io = socketIO.listen(server)
 
 
@@ -29,137 +31,13 @@ app.get("/play", (req, res) => {
     res.sendFile((__dirname + "/client/dist/index.html"))
 })
 
-//for hashed id
-let sessionCounter = 0
-let playerCounter = 0
 
-enum SessionState {
-    WAITING,
-    PLAYING
-}
-
-class Session {
-
-    sessionState : SessionState = SessionState.WAITING
-
-    readonly sessionID : string
-    players : Player[] = [] //contains playerID
-
-    activePlayerIndex : number = 0
-
-    constructor() {
-        
-        this.sessionID = "s"+sha256(sessionCounter.toString()).substring(0, 6)
-        sessionCounter++
-    }
-
-    addPlayer(player : Player) {
-        if(this.sessionState == SessionState.WAITING) {
-            player.currentSession = this
-            this.players.push(player)
-            
-            //broadcast to all that new player has joined
-            this.sendPlayerListUpdate()
-        }
-    }
-
-    removePlayer(player : Player) {
-        this.players.splice(this.players.indexOf(player))
-        player.currentSession = null
-        this.sendPlayerListUpdate()
-
-
-        //delete session if empty
-        if(this.players.length <= 0) {
-            sessions.splice(sessions.indexOf(this), 1)
-            console.log(`Session ${this.sessionID} is empty`)
-        }
-    }
-
-    checkState() {
-        if(this.players.length > 1 && this.players.every((player) : boolean => {
-            return player.isReady
-        })) {
-            //every player of this session is ready
-            this.startGame()
-        }
-    }
-
-    sendToPlayers(event : string, data : any) {
-        for (let player of this.players) {
-            player.socket.emit(event, data)
-        }
-    }
-
-    
-
-    sendPlayerListUpdate() {
-        const playerSocketData = []
-        for (let player of this.players) {
-            let data = {name:player.playerName, id:player.playerID, ready:player.isReady}
-            playerSocketData.push(data)
-        }
-        this.sendToPlayers("waiting.update", {players:playerSocketData, sessionID: this.sessionID})
-
-       
-    }
-
-    startGame() {
-        console.log(`Sessions ${this.sessionID} started it's game`)
-        
-
-        this.sendToPlayers("game.start", {
-            //empty, not relevant
-        })
-
-        this.sendGameUpdate()
-    }
-
-    sendGameUpdate() {
-        let gameUpdate : GameUpdate = {
-            players:[],
-            activePlayerID : this.players[this.activePlayerIndex].playerID,
-            direction: true,
-            handcards: []
-        }
-
-        gameUpdate.players = Array.from(this.players).map((player) => {return {name:player.playerName, id:player.playerID, cards:player.cards.length}})
-
-        
-
-        this.sendToPlayers("game.update", gameUpdate)
-    }
-
-}
-
-
-class Player {
-    readonly playerID : string
-    playerName : string
-    readonly socket : SocketIO.Socket
-    currentSession? : Session
-    isReady : boolean = false
-    cards? : string[] = []
-
-    constructor(name : string, socket: SocketIO.Socket) {
-        this.socket = socket
-        this.playerName = name
-        this.playerID = "p"+sha256(playerCounter.toString()).substring(0, 8)
-        playerCounter++
-    }
-
-    initGame() {
-        
-    }
-}
 
 //uno logic
 
-//sessions : hash and session itself
-const sessions : Session[] = []
 
-//players : hash and player itself
-const players : Player[] = []
+
+
 
 
 io.sockets.on("connection", (socket : SocketIO.Socket) => {
@@ -186,10 +64,10 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
 
     function joinSession(sID : string, nickname: string) {
         console.log("join request to session "+sID+" as nickname "+nickname)
-
-        let newSess: Session = null;
         
-        if(newSess = sessions.find(s => s.sessionID == sID) || null && nickname && nickname.length > 1) {
+        let newSess: Session = (sessions.find(s => s.sessionID == sID) || null);
+        
+        if(newSess && nickname && nickname.length > 1 && !newSess.players.find(p => p.playerName.trim() == nickname.trim())) {
             //add player to session
             player.playerName = nickname
             
@@ -210,6 +88,7 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
 
             //response
             socket.emit("join-res", {success: false})
+            socket.emit("alert", "Youd did something wrong while joining a session... :(")
             console.log(`Error on joining session ${sID}`)
         }
     }
@@ -236,6 +115,12 @@ io.sockets.on("connection", (socket : SocketIO.Socket) => {
         logStats()
 
        
+    })
+
+    socket.on("waiting.update.req", () => {
+        if(player.currentSession) {
+            player.currentSession.sendPlayerListUpdate()
+        }
     })
 
     socket.on("waiting.ready", (state) => {
