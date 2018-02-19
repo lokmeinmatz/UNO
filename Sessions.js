@@ -21,11 +21,30 @@ class Session {
         if (this.sessionState == SessionState.WAITING) {
             player.currentSession = this;
             this.players.push(player);
+            player.socket.on("waiting.update.req", () => {
+                if (player.currentSession) {
+                    this.sendPlayerListUpdate();
+                }
+            });
+            player.socket.on("waiting.ready", (state) => {
+                if (player.currentSession) {
+                    console.log("received waiting.ready");
+                    player.isReady = state;
+                    this.sendPlayerListUpdate();
+                    this.checkState();
+                }
+            });
+            //player.socket.on("game.playerEvent")
             //broadcast to all that new player has joined
             this.sendPlayerListUpdate();
         }
     }
+    removeListeners(player) {
+        player.socket.removeAllListeners("waiting.update.req");
+        player.socket.removeAllListeners("waiting.ready");
+    }
     removePlayer(player) {
+        this.removeListeners(player);
         this.players.splice(this.players.indexOf(player));
         player.currentSession = null;
         this.sendPlayerListUpdate();
@@ -62,14 +81,23 @@ class Session {
         this.sendGameUpdate();
     }
     sendGameUpdate() {
-        let gameUpdate = {
-            players: [],
-            activePlayerID: this.players[this.activePlayerIndex].playerID,
-            direction: true,
-            handcards: []
-        };
-        gameUpdate.players = Array.from(this.players).map((player) => { return { name: player.playerName, id: player.playerID, cards: player.cards.length }; });
-        this.sendToPlayers("game.update", gameUpdate);
+        //sessionwide vars
+        const players = Array.from(this.players).map((player) => { return { name: player.playerName, id: player.playerID, cards: player.cards.length }; });
+        const activePlayerID = this.players[this.activePlayerIndex].playerID;
+        for (let player of this.players) {
+            let gameUpdate = {
+                players: players,
+                activePlayerID: activePlayerID,
+                direction: true,
+                handcards: player.cards
+            };
+            player.socket.emit("game.update", gameUpdate);
+        }
+    }
+    cleanUp() {
+        for (let player of this.players) {
+            this.removeListeners(player);
+        }
     }
 }
 exports.Session = Session;

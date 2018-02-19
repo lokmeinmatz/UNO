@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("./client/utils");
 const Sessions_1 = require("./Sessions");
 const Players_1 = require("./Players");
 const express = require("express");
@@ -44,12 +45,12 @@ io.sockets.on("connection", (socket) => {
             newSess.addPlayer(player);
             console.log(`player ${nickname} has joined session ${sID}`);
             //response
-            socket.emit("join.res", { success: true, playerID: player.playerID });
+            socket.emit(utils_1.SocketEvents.ServerToClient.joinResponse, { success: true, playerID: player.playerID });
         }
         else {
             //response
-            socket.emit("join-res", { success: false });
-            socket.emit("alert", "Youd did something wrong while joining a session... :(");
+            socket.emit(utils_1.SocketEvents.ServerToClient.joinResponse, { success: false });
+            socket.emit(utils_1.SocketEvents.ServerToClient.alert, "Youd did something wrong while joining a session... :(");
             console.log(`Error on joining session ${sID}`);
         }
     }
@@ -59,7 +60,7 @@ io.sockets.on("connection", (socket) => {
     socket.on("create", (nick) => {
         if (nick.length < 2) {
             //response
-            socket.emit("join.res", { success: false });
+            socket.emit(utils_1.SocketEvents.ServerToClient.joinResponse, { success: false });
             return;
         }
         //Create session
@@ -68,19 +69,6 @@ io.sockets.on("connection", (socket) => {
         joinSession(session.sessionID, nick);
         console.log(`created new session | id:${session.sessionID} | creator: ${player.playerName}`);
         logStats();
-    });
-    socket.on("waiting.update.req", () => {
-        if (player.currentSession) {
-            player.currentSession.sendPlayerListUpdate();
-        }
-    });
-    socket.on("waiting.ready", (state) => {
-        if (player.currentSession) {
-            console.log("received waiting.ready");
-            player.isReady = state;
-            player.currentSession.sendPlayerListUpdate();
-            player.currentSession.checkState();
-        }
     });
 });
 function logStats() {

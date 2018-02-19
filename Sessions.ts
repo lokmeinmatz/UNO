@@ -22,10 +22,20 @@ export class Session {
 
     activePlayerIndex : number = 0
 
+    allCards : {id : string, player : Player}[] = []
+
     constructor() {
         
         this.sessionID = "s"+sha256(sessionCounter.toString()).substring(0, 6)
         sessionCounter++
+
+        
+    }
+    cardCounter = 0
+    //create card with uniqe id
+    createCard(type : string) : string {
+        this.cardCounter++
+        return type + sha256(this.cardCounter)
     }
 
     addPlayer(player : Player) {
@@ -106,6 +116,9 @@ export class Session {
 
     startGame() {
         console.log(`Sessions ${this.sessionID} started it's game`)
+
+        //set player cards
+
         
 
         this.sendToPlayers("game.start", {

@@ -69,7 +69,7 @@ require = (function (modules, cache, entry) {
 
   // Override the current require with this new one
   return newRequire;
-})({10:[function(require,module,exports) {
+})({8:[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class CardColors {
@@ -281,7 +281,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],7:[function(require,module,exports) {
+},{}],6:[function(require,module,exports) {
 var global = (1,eval)("this");
 var process = require("process");
 /*!
@@ -10649,7 +10649,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{"process":9}],6:[function(require,module,exports) {
+},{"process":9}],4:[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const colors_1 = require("./colors");
@@ -10833,7 +10833,7 @@ class UI {
 const UIi = new UI();
 exports.default = UIi;
 
-},{"./colors":10,"./jquery":7}],17:[function(require,module,exports) {
+},{"./colors":8,"./jquery":6}],10:[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocketEvents = {
@@ -10848,7 +10848,7 @@ exports.SocketEvents = {
     }
 };
 
-},{}],16:[function(require,module,exports) {
+},{}],5:[function(require,module,exports) {
 "use strict";
 //CLIENT
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -10993,7 +10993,7 @@ class UserStateManager {
 let userState = new UserStateManager();
 exports.default = userState;
 
-},{"./UI":6,"./jquery":7,"./utils":17}],3:[function(require,module,exports) {
+},{"./UI":4,"./jquery":6,"./utils":10}],3:[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const UI_1 = require("./UI");
@@ -11013,7 +11013,7 @@ $(document).ready(() => {
     UI_1.default.setHandClickHandler();
 });
 
-},{"./UI":6,"./ClientStates":16,"./jquery":7}],11:[function(require,module,exports) {
+},{"./UI":4,"./ClientStates":5,"./jquery":6}],12:[function(require,module,exports) {
 
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
@@ -11033,7 +11033,7 @@ module.bundle.Module = Module;
 
 if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
-  var ws = new WebSocket('ws://' + hostname + ':' + '5607' + '/');
+  var ws = new WebSocket('ws://' + hostname + ':' + '1382' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
@@ -11134,5 +11134,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.require, id);
   });
 }
-},{}]},{},[11,3])
+},{}]},{},[12,3])
 //# sourceMappingURL=/dist/098d5cdd1d57d86ddab51e5ac009e05e.map
